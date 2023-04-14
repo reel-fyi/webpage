@@ -26,17 +26,23 @@ const SignupForm = () => {
       passwordConfirm: password,
       email,
     };
-    // create user
-    const record = await pb.collection('users').create(data);
-    console.log(record);
-    // login user
-    const authData = await pb.collection('users').authWithPassword(
-      email,
-      password
-    );
-    console.log(authData);
-    // redirect to dashboard
-    router.push('/dashboard');
+    try {
+      // create user
+      const record = await pb.collection('users').create(data);
+      console.log(record);
+      // login user
+      const authData = await pb.collection('users').authWithPassword(
+        email,
+        password
+      );
+      console.log(authData);
+      localStorage.removeItem('first_reel_sent');
+      // redirect to dashboard
+      router.push('/dashboard?ref=signup');
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+    }
   }
 
   const LoadingSpinner = (
@@ -57,7 +63,7 @@ const SignupForm = () => {
             id='fname'
             className='grow'
             type="text"
-            placeholder="Dake"
+            placeholder="First Name"
             onChange={(e) => setFname(e.target.value)}
             required
           />
@@ -70,7 +76,7 @@ const SignupForm = () => {
             id='lname'
             className="grow"
             type="text"
-            placeholder="Zhang"
+            placeholder="Last Name"
             onChange={(e) => setLname(e.target.value)}
             required
           />
@@ -83,7 +89,7 @@ const SignupForm = () => {
         <TextInput
           id='email'
           type="email"
-          placeholder="dake@reel.fyi"
+          placeholder="Email"
           onChange={(e) => setEmail(e.target.value)}
           required
         />
@@ -123,7 +129,7 @@ const LoginForm = () => {
     );
     console.log(authData);
     // redirect to dashboard
-    router.push('/dashboard?ref=signup');
+    router.push('/dashboard');
   }
 
   const LoadingSpinner = (
@@ -140,9 +146,9 @@ const LoginForm = () => {
           <Label htmlFor="email">Email</Label>
         </div>
         <TextInput
-          id='email'
+          id='login-email'
           type="email"
-          placeholder="yesh@reel.fyi"
+          placeholder="Email"
           onChange={(e) => setEmail(e.target.value)}
           required
         />

@@ -1,4 +1,4 @@
-import { Accordion, Button, Card, Textarea, Toast } from 'flowbite-react';
+import { Accordion, Alert, Button, Card, Textarea } from 'flowbite-react';
 import Head from 'next/head'
 import { useEffect, useState } from 'react';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
@@ -17,17 +17,16 @@ const IncompleteCheckIcon = () => (
 );
 
 const SavedNotification = () => (
-  <div className='flex justify-end'>
-    <Toast>
-      <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
-        <HiCheck className="h-5 w-5" />
-      </div>
-      <div className="ml-3 text-sm font-normal">
+  <Alert
+    color="success"
+    icon={HiCheck}
+  >
+    <span>
+      <span className="font-medium text-md">
         Paragraph Saved!
-      </div>
-      <Toast.Toggle />
-    </Toast>
-  </div>
+      </span>
+    </span>
+  </Alert>
 );
 
 export default function Dashboard() {
@@ -37,7 +36,7 @@ export default function Dashboard() {
   const [checklist, setCheckList] = useState({
     downloadExtension: false,
     addBio: false,
-    sendFirstReel: false,
+    sentFirstReel: false,
   });
   const [showDemo, setShowDemo] = useState(false);
   const router = useRouter();
@@ -47,21 +46,22 @@ export default function Dashboard() {
       const settings = {
         downloadExtension: true,
         addBio: false,
-        sendFirstReel: false,
+        sentFirstReel: false,
       }
       const storageData = localStorage.getItem('pocketbase_auth');
       if (storageData !== null) {
         const userInfo = JSON.parse(storageData);
         if (Object.hasOwn(userInfo, 'model')) {
           setUserData(userInfo.model as Record);
-          if (userInfo.model.bio !== undefined) {
+          console.log(userInfo.model);
+          if (userInfo.model.bio !== undefined && userInfo.model.bio !== '') {
             settings.addBio = true;
+            const sentFirstReel = localStorage.getItem('first_reel_sent');
+            if (sentFirstReel !== null) {
+              settings.sentFirstReel = true;
+            }
           }
         }
-      }
-      const sentFirstReel = localStorage.getItem('first_reel_sent');
-      if (sentFirstReel !== null) {
-        settings.sendFirstReel = true;
       }
       setCheckList({
         ...checklist,
@@ -115,13 +115,15 @@ export default function Dashboard() {
   }
 
   const sentFirstReel = () => {
-    if (checklist.sendFirstReel) return;
+    if (checklist.sentFirstReel) return;
     setCheckList({
       ...checklist,
-      sendFirstReel: true,
+      sentFirstReel: true,
     });
     localStorage.setItem('first_reel_sent', 'true');
   }
+
+  const bioMaxLen = 300;
 
   return (
     <div>
@@ -134,7 +136,6 @@ export default function Dashboard() {
       <Header />
       <div className="flex dark:bg-gray-900 min-h-screen">
         <main className="mx-4 mt-4 flex-[1_0_16rem]">
-          {saved ? <SavedNotification /> : null}
           <div className="flex justify-center">
             <Card className="mt-4 mb-4 w-2/3">
               <h2 className="text-xl dark:text-gray-200">Dashboard</h2>
@@ -164,6 +165,7 @@ export default function Dashboard() {
                   </Accordion.Title>
                   <Accordion.Content>
                     <div className='flex flex-col gap-3'>
+                      {saved ? <SavedNotification /> : null}
                       <p className="mb-2 text-gray-700 dark:text-gray-400 font-light">
                         Stand out on LinkedIn with personalized messaging.
                         Tell us about your career and professional journey in just a few sentences.
@@ -175,12 +177,12 @@ export default function Dashboard() {
                           Customize your outreach with a short paragraph
                         </p>
                         <p className='text-gray-600 dark:text-gray-500 font-light text-sm'>
-                          {bio.length}/120
+                          {bio.length}/{bioMaxLen}
                         </p>
                       </div>
                       <Textarea
                         minLength={10}
-                        maxLength={120}
+                        maxLength={bioMaxLen}
                         rows={2}
                         className="mb-2"
                         placeholder="I&apos;m Dake, an incoming product manager intern at Microsoft and co-founder of Reel.fyi. I&apos;m also a junior at Indiana University and president of Product Management Club at IU."
@@ -207,7 +209,7 @@ export default function Dashboard() {
                 <Accordion.Panel>
                   <Accordion.Title>
                     <div className='flex gap-px'>
-                      {checklist.sendFirstReel ? <CompleteCheckIcon /> : <IncompleteCheckIcon />}
+                      {checklist.sentFirstReel ? <CompleteCheckIcon /> : <IncompleteCheckIcon />}
                       <span className='mt-1'>Send your first Reel! 🥳</span>
                     </div>
                   </Accordion.Title>
