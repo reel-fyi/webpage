@@ -39,6 +39,7 @@ export default function Dashboard() {
     addBio: false,
     sendFirstReel: false,
   });
+  const [showDemo, setShowDemo] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -67,6 +68,11 @@ export default function Dashboard() {
         ...settings,
       });
     }
+
+    if (router.asPath === '/dashboard?ref=signup') {
+      setShowDemo(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSave = async (e: React.SyntheticEvent) => {
@@ -101,10 +107,10 @@ export default function Dashboard() {
         }, 5000);
       } catch (err) {
         console.log(err);
-        router.push('/auth');
+        router.push('/auth?ref=dashboard');
       }
     } else {
-      router.push('/auth');
+      router.push('/auth?ref=dashboard');
     }
   }
 
@@ -153,22 +159,17 @@ export default function Dashboard() {
                   <Accordion.Title>
                     <div className='flex gap-px'>
                       {checklist.addBio ? <CompleteCheckIcon /> : <IncompleteCheckIcon />}
-                      <span className='mt-1'>Train your AI</span>
+                      <span className='mt-1'>Personalize your outreach messages</span>
                     </div>
                   </Accordion.Title>
                   <Accordion.Content>
                     <div className='flex flex-col gap-3'>
-                      <ul className="ml-4 mb-4 list-disc text-gray-700 dark:text-gray-400 font-light">
-                        <li>
-                          Get messgaes personalized to you as a job seeker
-                        </li>
-                        <li>
-                          What&apos;s most relevant to you?
-                        </li>
-                        <li>
-                          What&apos;s most relevant to your dream job or company?
-                        </li>
-                      </ul>
+                      <p className="mb-2 text-gray-700 dark:text-gray-400 font-light">
+                        Stand out on LinkedIn with personalized messaging.
+                        Tell us about your career and professional journey in just a few sentences.
+                        We&apos;ll use this info to craft tailored outreach messages that increase your chances of success.
+                        Happy networking!
+                      </p>
                       <div className='flex justify-between items-center'>
                         <p className="text-gray-700 dark:text-gray-400 font-medium">
                           Customize your outreach with a short paragraph
