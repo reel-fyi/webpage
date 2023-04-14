@@ -54,8 +54,8 @@ const SignupForm = () => {
 
   const form = (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-      <div className='flex mt-2 gap-2'>
-        <div className='flex items-center basis-1/2'>
+      <div className='flex mt-2 justify-between'>
+        <div className='flex flex-col gap-y-2 basis-[47%]'>
           <div className="mr-2">
             <Label htmlFor="fname">First Name</Label>
           </div>
@@ -68,7 +68,7 @@ const SignupForm = () => {
             required
           />
         </div>
-        <div className='flex items-center basis-1/2 ml-2'>
+        <div className='flex flex-col gap-y-2 basis-[47%]'>
           <div className="mr-2">
             <Label htmlFor="lname">Last Name</Label>
           </div>
@@ -94,7 +94,7 @@ const SignupForm = () => {
           required
         />
       </div>
-      <div>
+      <div className='mb-2'>
         <div className="mb-2 block">
           <Label htmlFor="password">Password</Label>
         </div>
