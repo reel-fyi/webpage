@@ -33,11 +33,12 @@ function MyApp({ Component, pageProps }: AppProps) {
           }
         }
       }
-    }
+    },
+    
   };
 
   return (
-    <Flowbite theme={{ theme }}>
+    <Flowbite theme={{ theme, dark: false }}>
       <Component {...pageProps} />
     </Flowbite>
   );
