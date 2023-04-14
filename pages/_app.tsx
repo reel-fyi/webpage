@@ -5,7 +5,9 @@ import { CustomFlowbiteTheme, Flowbite, useTheme } from 'flowbite-react';
 function MyApp({ Component, pageProps }: AppProps) {
   const theme: CustomFlowbiteTheme = {
     button: {
-      base: 'text-white bg-purple-700 border border-transparent hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 disabled:hover:bg-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800 dark:disabled:hover:bg-purple-600 focus:!ring-2 group flex h-min items-center justify-center p-0.5 text-center font-medium focus:z-10 rounded-lg'
+      color: {
+        'clear': 'text-purple-700 dark:text-purple-500 hover:text-white dark:hover:text-white bg-transparent border border-purple-700 hover:bg-purple-600 focus:ring-4 focus:ring-purple-300 disabled:hover:bg-purple-700 dark:hover:bg-purple-700 dark:focus:ring-purple-800 dark:disabled:hover:bg-purple-600 focus:!ring-2 group flex h-min items-center justify-center p-0.5 text-center font-medium focus:z-10 rounded-lg',
+      }
     },
     textInput: {
       field: {
@@ -13,6 +15,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           base: 'block w-full border disabled:cursor-not-allowed disabled:opacity-50 bg-gray-50 border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-purple-500 dark:focus:ring-purple-500 rounded-lg p-2.5 text-sm'
         }
       }
+    },
+    textarea: {
+      base: 'block w-full rounded-lg border disabled:cursor-not-allowed disabled:opacity-50 bg-gray-50 border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-purple-500 dark:focus:ring-purple-500'
     },
     tab: {
       tablist: {

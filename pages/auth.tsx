@@ -56,7 +56,7 @@ const SignupForm = () => {
             id='fname'
             className='grow'
             type="text"
-            placeholder="Richard"
+            placeholder="Dake"
             onChange={(e) => setFname(e.target.value)}
             required
           />
@@ -69,7 +69,7 @@ const SignupForm = () => {
             id='lname'
             className="grow"
             type="text"
-            placeholder="Bachman"
+            placeholder="Zhang"
             onChange={(e) => setLname(e.target.value)}
             required
           />
@@ -82,7 +82,7 @@ const SignupForm = () => {
         <TextInput
           id='email'
           type="email"
-          placeholder="rbachman@stanford.edu"
+          placeholder="dake@reel.fyi"
           onChange={(e) => setEmail(e.target.value)}
           required
         />
@@ -98,7 +98,7 @@ const SignupForm = () => {
           onChange={(e) => setPassword(e.target.value)}
           required />
       </div>
-      <Button type="submit">Sign up</Button>
+      <Button type="submit" color="purple">Sign up</Button>
     </form>
   )
 
@@ -141,7 +141,7 @@ const LoginForm = () => {
         <TextInput
           id='email'
           type="email"
-          placeholder="rbachman@stanford.edu"
+          placeholder="yesh@reel.fyi"
           onChange={(e) => setEmail(e.target.value)}
           required
         />
@@ -157,7 +157,7 @@ const LoginForm = () => {
           onChange={(e) => setPassword(e.target.value)}
           required />
       </div>
-      <Button type="submit">Login</Button>
+      <Button type="submit" color="purple">Login</Button>
     </form>
   );
 
