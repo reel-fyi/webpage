@@ -1,5 +1,23 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+import Cors from 'cors';
+import e from "cors";
+
+// Initializing the cors middleware
+const cors = Cors({
+  methods: ['POST'],
+  origin: '*',
+});
+
+function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: any) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result: any) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
 
 type Data = {
   message: string;
@@ -20,6 +38,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  // Run the middleware
+  await runMiddleware(req, res, cors);
+
   // only use POST method
   if (req.method === "POST") {
     const { user, conn }: { user: User; conn: Connection } = req.body;
