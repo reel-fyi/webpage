@@ -54,7 +54,7 @@ export default async function handler(
       console.log(
         `${user.id}: ${user.name} requested a connection message for ${conn.name} - ${conn.info}`
       );
-      const prompt = `Write a LinkedIn connection request message according to the following requirements. Personalize it based on the sender and recipient info. Keep it short, concise and in plain English. Focus on the recipient's primary need of connecting with someone they want to learn more about in terms of a role and/or a specific company and include a clear call to action in a short phone/online call AKA a coffee chat or information interview.\nSender info: name, ${user.name}; experience, ${user.bio}\nRecipient info: name, ${conn.name}; profile information, ${conn.info}`;
+      const prompt = `Write a LinkedIn connection request message according to the following requirements. Personalize it based on the sender and recipient info. Keep it within 300 characters, concise and in plain English. Focus on the recipient's primary need of connecting with someone they want to learn more about in terms of a role and/or a specific company and include a clear call to action in a short phone/online call AKA a coffee chat or information interview.\nSender info: name, ${user.name}; experience, ${user.bio}\nRecipient info: name, ${conn.name}; profile information, ${conn.info}`;
       const genRes = await openai.createCompletion({
         model: "text-davinci-003",
         prompt,
