@@ -139,6 +139,7 @@ export default function Dashboard() {
         });
         // "hack" to update chrome extension without having to publish a new version
         router.push('/dashboard?ref=bio_saved');
+        router.reload();
         // To be used in the future
         // setTimeout(() => {
         //   setSaved(false)
@@ -226,9 +227,8 @@ export default function Dashboard() {
     </Modal>
   );
 
-  // remove key later
   return (
-    <div key={router.asPath}>
+    <div>
       <Head>
         <title>Reel.fyi - Networking Magic for Job Seekers</title>
         <meta name="description" content="Networking Magic for Job Seekers" />
