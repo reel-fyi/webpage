@@ -57,6 +57,7 @@ export default function Dashboard() {
         if (Object.hasOwn(userInfo, 'model')) {
           setUserData(userInfo.model as Record);
           if (userInfo.model.bio !== undefined && userInfo.model.bio !== '') {
+            setBio(userInfo.model.bio as string);
             settings.addBio = true;
             const sentFirstReel = localStorage.getItem('first_reel_sent');
             if (sentFirstReel !== null) {
@@ -104,8 +105,19 @@ export default function Dashboard() {
             model: record
           }));
         }
+        // Update extension
+        chrome.runtime.sendMessage(process.env.NEXT_PUBLIC_EXTENSION_ID, {profileUpdated: true}, (response) => {
+          if (!response) {
+            console.error('No response from extension');
+          } else if (response.success) {
+            console.log('Extension updated');
+          } else if (!response.success) {
+            console.error('Extension update failed');
+          } else {
+            console.error(response);
+          }
+        });
         // Update UI
-        setBio('');
         setSaved(true);
         setCheckList({
           ...checklist,
