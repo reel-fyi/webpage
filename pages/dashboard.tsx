@@ -86,7 +86,9 @@ export default function Dashboard() {
       const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
       if (token) {
         mixpanel.init(token);
-        mixpanel.identify(userData.id);
+        if (!mixpanel.get_distinct_id()) {
+          mixpanel.identify(userData.id);
+        }
         mixpanel.track('dashboard_page_view');
         setIsAnalyticsEnabled(true);
       }

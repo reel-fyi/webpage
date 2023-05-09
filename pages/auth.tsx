@@ -1,9 +1,9 @@
-import { Button, Card, Label, Spinner, Tabs, TextInput, Toast } from 'flowbite-react'
+import { Alert, Button, Card, Label, Spinner, Tabs, TextInput, Toast } from 'flowbite-react'
 import Head from 'next/head'
 import PocketBase from 'pocketbase'
 import 'cross-fetch/polyfill';
 import { useEffect, useState } from 'react';
-import { HiX } from 'react-icons/hi'
+import { HiX, HiInformationCircle } from 'react-icons/hi'
 import Header from '../components/Header';
 import { useRouter } from 'next/router';
 import mixpanel from 'mixpanel-browser';
@@ -130,6 +130,7 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
@@ -137,13 +138,19 @@ const LoginForm = () => {
     setIsLoading(true);
     const pb = new PocketBase(process.env.NEXT_PUBLIC_API_URL);
     // login user
-    const authData = await pb.collection('users').authWithPassword(
-      email,
-      password
-    );
-    console.log(authData);
-    // redirect to dashboard
-    router.push('/dashboard');
+    try {
+      const authData = await pb.collection('users').authWithPassword(
+        email,
+        password
+      );
+      console.log(authData);
+      // redirect to dashboard
+      router.push('/dashboard');
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+      setError(true);
+    }
   }
 
   const LoadingSpinner = (
@@ -153,8 +160,23 @@ const LoginForm = () => {
     </div>
   );
 
+  const ErrorNotification = (
+    <Alert
+      color="failure"
+      icon={HiInformationCircle}
+    >
+      <span>
+        <span className="font-medium text-md">
+          Invalid email or password!
+        </span>
+        {' '}Please try again.
+      </span>
+    </Alert>
+  );
+
   const form = (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+      {error && ErrorNotification}
       <div>
         <div className="mb-2 block">
           <Label htmlFor="email">Email</Label>
