@@ -139,7 +139,9 @@ export default function Dashboard() {
         });
         // "hack" to update chrome extension without having to publish a new version
         router.push('/dashboard?ref=bio_saved');
-        router.reload();
+        setTimeout(() => {
+          router.reload();
+        }, 1000);
         // To be used in the future
         // setTimeout(() => {
         //   setSaved(false)
