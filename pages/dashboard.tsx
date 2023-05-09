@@ -81,6 +81,8 @@ export default function Dashboard() {
         } else {
           router.push('/auth?ref=dashboard');
         }
+      } else if (router.asPath === '/dashboard?ref=bio_saved') {
+        setSaved(true);
       }
 
       const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
@@ -89,8 +91,11 @@ export default function Dashboard() {
         if (!mixpanel.get_distinct_id()) {
           mixpanel.identify(userData.id);
         }
-        mixpanel.track('dashboard_page_view');
         setIsAnalyticsEnabled(true);
+        // remove later
+        if (router.asPath !== '/dashboard?ref=bio_saved') {
+          mixpanel.track('dashboard_page_view');
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -116,21 +121,15 @@ export default function Dashboard() {
             model: record
           }));
         }
-        // Update extension
-        chrome.runtime.sendMessage(process.env.NEXT_PUBLIC_EXTENSION_ID, { profileUpdated: true }, (response) => {
-          if (!response) {
-            console.error('No response from extension');
-          } else if (response.success) {
-            console.log('Extension updated');
-          } else if (!response.success) {
-            console.error('Extension update failed');
-          } else {
-            console.error(response);
-          }
-        });
         // Update analytics
         if (isAnalyticsEnabled) {
           mixpanel.track('dashboard_personalize_save');
+        }
+        // Update extension
+        if (typeof window !== 'undefined') {
+          window.postMessage({ type: 'UPDATE_PROFILE' }, '*');
+        } else {
+          console.error('Update extension: window object not found');
         }
         // Update UI
         setSaved(true);
@@ -138,9 +137,12 @@ export default function Dashboard() {
           ...checklist,
           addBio: true,
         });
-        setTimeout(() => {
-          setSaved(false)
-        }, 5000);
+        // "hack" to update chrome extension without having to publish a new version
+        router.push('/dashboard?ref=bio_saved');
+        // To be used in the future
+        // setTimeout(() => {
+        //   setSaved(false)
+        // }, 5000);
       } catch (err) {
         console.log(err);
         router.push('/auth?ref=dashboard');
@@ -151,6 +153,7 @@ export default function Dashboard() {
   }
 
   const handleClear = (e: React.SyntheticEvent) => {
+    e.preventDefault();
     setBio('');
     // Update analytics
     if (isAnalyticsEnabled) {
@@ -159,6 +162,7 @@ export default function Dashboard() {
   }
 
   const handleOnTextAreaFocus = (e: React.SyntheticEvent) => {
+    e.preventDefault();
     // Update analytics
     if (isAnalyticsEnabled) {
       mixpanel.track('dashboard_text_input_focused');
@@ -176,6 +180,16 @@ export default function Dashboard() {
         sentFirstReel: true,
       });
       localStorage.setItem('first_reel_sent', 'true');
+    }
+  }
+
+  // remove late 
+  const handleOnBioOpen = (e: React.SyntheticEvent) => {
+    // remove saved notification
+    if (saved) {
+      setTimeout(() => {
+        setSaved(false);
+      }, 3000);
     }
   }
 
@@ -239,10 +253,10 @@ export default function Dashboard() {
                     <p className="mb-2 text-gray-700 dark:text-gray-400 font-light">
                       To use Reel.fyi, you&apos;ll need to install our Chrome Extension.
                     </p>
-                    <a 
-                    className="text-purple-600 hover:underline dark:text-purple-500"
-                    href="https://chrome.google.com/webstore/detail/reelfyi-chrome-extension/fhofneeegphbcpfdepceejjekejkhlki"
-                    target='_blank'>
+                    <a
+                      className="text-purple-600 hover:underline dark:text-purple-500"
+                      href="https://chrome.google.com/webstore/detail/reelfyi-chrome-extension/fhofneeegphbcpfdepceejjekejkhlki"
+                      target='_blank'>
                       Download it from here!
                     </a>
                   </Accordion.Content>
@@ -254,7 +268,7 @@ export default function Dashboard() {
                       <span className='mt-1'>Personalize your outreach messages</span>
                     </div>
                   </Accordion.Title>
-                  <Accordion.Content>
+                  <Accordion.Content onClick={handleOnBioOpen}>
                     <div className='flex flex-col gap-3'>
                       {saved ? <SavedNotification /> : null}
                       <p className="mb-2 text-gray-700 dark:text-gray-400 font-light">
