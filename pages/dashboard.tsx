@@ -192,7 +192,7 @@ export default function Dashboard() {
                     <p className="mb-2 text-gray-700 dark:text-gray-400 font-light">
                       To use Reel.fyi, you&apos;ll need to install our Chrome Extension.
                     </p>
-                    <a className="text-purple-600 hover:underline dark:text-purple-500" href="https://reel.fyi">
+                    <a className="text-purple-600 hover:underline dark:text-purple-500" href="https://chrome.google.com/webstore/detail/reelfyi-chrome-extension/fhofneeegphbcpfdepceejjekejkhlki">
                       Download it from here!
                     </a>
                   </Accordion.Content>
@@ -264,7 +264,7 @@ export default function Dashboard() {
                       </span>
                       <div className='flex h-[36rem]'>
                         <iframe
-                          src="https://demo.arcade.software/v70Zj4pNVWI7uIN7yOTV?embed"
+                          src="https://demo.arcade.software/2gCk5eGLEp6wdYHk9aB6?embed"
                           loading="lazy"
                           allowFullScreen
                           className='w-full'
