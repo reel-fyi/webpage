@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 import { HiCheck } from 'react-icons/hi'
 import PocketBase, { type Record } from 'pocketbase';
-
+import mixpanel from 'mixpanel-browser';
 import Header from "../components/Header";
 import welcomeImage from "../public/welcome.svg"
 
@@ -42,6 +42,7 @@ export default function Dashboard() {
     sentFirstReel: false,
   });
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [isAnalyticsEnabled, setIsAnalyticsEnabled] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -81,6 +82,14 @@ export default function Dashboard() {
           router.push('/auth?ref=dashboard');
         }
       }
+
+      const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
+      if (token) {
+        mixpanel.init(token);
+        mixpanel.identify(userData.id);
+        mixpanel.track('dashboard_page_view');
+        setIsAnalyticsEnabled(true);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -106,7 +115,7 @@ export default function Dashboard() {
           }));
         }
         // Update extension
-        chrome.runtime.sendMessage(process.env.NEXT_PUBLIC_EXTENSION_ID, {profileUpdated: true}, (response) => {
+        chrome.runtime.sendMessage(process.env.NEXT_PUBLIC_EXTENSION_ID, { profileUpdated: true }, (response) => {
           if (!response) {
             console.error('No response from extension');
           } else if (response.success) {
@@ -117,6 +126,10 @@ export default function Dashboard() {
             console.error(response);
           }
         });
+        // Update analytics
+        if (isAnalyticsEnabled) {
+          mixpanel.track('dashboard_personalize_save');
+        }
         // Update UI
         setSaved(true);
         setCheckList({
@@ -135,13 +148,33 @@ export default function Dashboard() {
     }
   }
 
-  const sentFirstReel = () => {
-    if (checklist.sentFirstReel) return;
-    setCheckList({
-      ...checklist,
-      sentFirstReel: true,
-    });
-    localStorage.setItem('first_reel_sent', 'true');
+  const handleClear = (e: React.SyntheticEvent) => {
+    setBio('');
+    // Update analytics
+    if (isAnalyticsEnabled) {
+      mixpanel.track('dashboard_personalize_clear');
+    }
+  }
+
+  const handleOnTextAreaFocus = (e: React.SyntheticEvent) => {
+    // Update analytics
+    if (isAnalyticsEnabled) {
+      mixpanel.track('dashboard_text_input_focused');
+    }
+  }
+
+  const handleOnDemoClick = (e: React.SyntheticEvent) => {
+    // Update analytics
+    if (isAnalyticsEnabled) {
+      mixpanel.track('dashboard_demo_click');
+    }
+    if (!checklist.sentFirstReel) {
+      setCheckList({
+        ...checklist,
+        sentFirstReel: true,
+      });
+      localStorage.setItem('first_reel_sent', 'true');
+    }
   }
 
   const bioMaxLen = 300;
@@ -240,6 +273,7 @@ export default function Dashboard() {
                         className="mb-2 placeholder:text-gray-400"
                         placeholder="I&apos;m Richard, founder and CEO of Piped Piper, a compression company. Prior to this I worked at Hooli, a tech giant, as a software engineer. I also developed a music app on the side, where I stumbled upon the compression algorithm that would eventually become the foundation of Pied Piper."
                         onChange={(e) => setBio(e.target.value)}
+                        onFocus={handleOnTextAreaFocus}
                         value={bio}
                       />
                       <div className='flex gap-x-4'>
@@ -252,7 +286,7 @@ export default function Dashboard() {
                         <Button type="button"
                           className='w-20'
                           color="clear"
-                          onClick={() => setBio('')}>
+                          onClick={handleClear}>
                           Clear
                         </Button>
                       </div>
@@ -266,7 +300,7 @@ export default function Dashboard() {
                       <span className='mt-1'>Send your first Reel! 🥳</span>
                     </div>
                   </Accordion.Title>
-                  <Accordion.Content onClick={sentFirstReel}>
+                  <Accordion.Content onClick={handleOnDemoClick}>
                     <div className='flex flex-col gap-3'>
                       <p className="mb-2 text-gray-700 dark:text-gray-400 font-light">
                         Start networking with one-click outreach - now that you&apos;re all set up, it&apos;s time to start reaching out to potential connections with just one click! We&apos;ll walk you through with a demo first.

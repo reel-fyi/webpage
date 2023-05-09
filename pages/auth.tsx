@@ -4,9 +4,9 @@ import PocketBase from 'pocketbase'
 import 'cross-fetch/polyfill';
 import { useEffect, useState } from 'react';
 import { HiX } from 'react-icons/hi'
-
 import Header from '../components/Header';
 import { useRouter } from 'next/router';
+import mixpanel from 'mixpanel-browser';
 
 const SignupForm = () => {
   const [fname, setFname] = useState('');
@@ -14,7 +14,16 @@ const SignupForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAnalyticsEnabled, setIsAnalyticsEnabled] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
+    if (token) {
+      mixpanel.init(token);
+      setIsAnalyticsEnabled(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -36,6 +45,11 @@ const SignupForm = () => {
         password
       );
       console.log(authData);
+      // track user signup
+      if (isAnalyticsEnabled) {
+        mixpanel.identify(record.id);
+        mixpanel.track('dashboard_sign_up');
+      }
       localStorage.removeItem('first_reel_sent');
       // redirect to dashboard
       router.push('/dashboard?ref=signup');
