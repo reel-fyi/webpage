@@ -239,7 +239,10 @@ export default function Dashboard() {
                     <p className="mb-2 text-gray-700 dark:text-gray-400 font-light">
                       To use Reel.fyi, you&apos;ll need to install our Chrome Extension.
                     </p>
-                    <a className="text-purple-600 hover:underline dark:text-purple-500" href="https://chrome.google.com/webstore/detail/reelfyi-chrome-extension/fhofneeegphbcpfdepceejjekejkhlki">
+                    <a 
+                    className="text-purple-600 hover:underline dark:text-purple-500"
+                    href="https://chrome.google.com/webstore/detail/reelfyi-chrome-extension/fhofneeegphbcpfdepceejjekejkhlki"
+                    target='_blank'>
                       Download it from here!
                     </a>
                   </Accordion.Content>
