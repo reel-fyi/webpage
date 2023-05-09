@@ -226,8 +226,9 @@ export default function Dashboard() {
     </Modal>
   );
 
+  // remove key later
   return (
-    <div>
+    <div key={router.asPath}>
       <Head>
         <title>Reel.fyi - Networking Magic for Job Seekers</title>
         <meta name="description" content="Networking Magic for Job Seekers" />
