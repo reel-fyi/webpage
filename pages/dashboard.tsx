@@ -87,15 +87,14 @@ export default function Dashboard() {
 
       const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
       if (token) {
-        mixpanel.init(token);
-        if (!mixpanel.get_distinct_id()) {
-          mixpanel.identify(userData.id);
-        }
+        mixpanel.init(token, {
+          loaded: () => {
+            if (mixpanel.get_distinct_id() !== userData.id) {
+              mixpanel.identify(userData.id);
+            }
+          }
+        });
         setIsAnalyticsEnabled(true);
-        // remove later
-        if (router.asPath !== '/dashboard?ref=bio_saved') {
-          mixpanel.track('dashboard_page_view');
-        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,15 +136,9 @@ export default function Dashboard() {
           ...checklist,
           addBio: true,
         });
-        // "hack" to update chrome extension without having to publish a new version
-        router.push('/dashboard?ref=bio_saved');
         setTimeout(() => {
-          router.reload();
-        }, 1000);
-        // To be used in the future
-        // setTimeout(() => {
-        //   setSaved(false)
-        // }, 5000);
+          setSaved(false)
+        }, 5000);
       } catch (err) {
         console.log(err);
         router.push('/auth?ref=dashboard');
@@ -183,16 +176,6 @@ export default function Dashboard() {
         sentFirstReel: true,
       });
       localStorage.setItem('first_reel_sent', 'true');
-    }
-  }
-
-  // remove late 
-  const handleOnBioOpen = (e: React.SyntheticEvent) => {
-    // remove saved notification
-    if (saved) {
-      setTimeout(() => {
-        setSaved(false);
-      }, 3000);
     }
   }
 
@@ -271,14 +254,13 @@ export default function Dashboard() {
                       <span className='mt-1'>Personalize your outreach messages</span>
                     </div>
                   </Accordion.Title>
-                  <Accordion.Content onClick={handleOnBioOpen}>
+                  <Accordion.Content>
                     <div className='flex flex-col gap-3'>
                       {saved ? <SavedNotification /> : null}
                       <p className="mb-2 text-gray-700 dark:text-gray-400 font-light">
-                        Stand out on LinkedIn with personalized messaging.
-                        Tell us about your career and professional journey in just a few sentences.
-                        We&apos;ll use this info to craft tailored outreach messages that increase your chances of success.
-                        Happy networking!
+                        Train our AI to create customized outreach messages and elevate
+                        your networking strategy on LinkedIn. Input a brief paragraph 
+                        about your career and professional journey to get started.
                       </p>
                       <div className='flex justify-between items-center'>
                         <p className="text-gray-700 dark:text-gray-400 font-medium">
@@ -332,7 +314,7 @@ export default function Dashboard() {
                       </span>
                       <div className='flex h-[36rem]'>
                         <iframe
-                          src="https://demo.arcade.software/2gCk5eGLEp6wdYHk9aB6?embed"
+                          src="https://demo.arcade.software/TI0BXfE1KIH1G58a2J44?embed"
                           loading="lazy"
                           allowFullScreen
                           className='w-full'
