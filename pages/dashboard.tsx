@@ -94,7 +94,9 @@ export default function Dashboard() {
             }
           }
         });
-        setIsAnalyticsEnabled(true);
+        if (process.env.NODE_ENV === 'production') {
+          setIsAnalyticsEnabled(true);
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -258,13 +260,18 @@ export default function Dashboard() {
                     <div className='flex flex-col gap-3'>
                       {saved ? <SavedNotification /> : null}
                       <p className="mb-2 text-gray-700 dark:text-gray-400 font-light">
-                        Train our AI to create customized outreach messages and elevate
-                        your networking strategy on LinkedIn. Input a brief paragraph 
-                        about your career and professional journey to get started.
+                        Train our AI to craft personalized outreach messages and
+                        take your LinkedIn networking strategy to the next level.
+                        To get started, provide a short summary of your career
+                        and professional journey. Consider this as your elevator
+                        pitch - only the most relevant highlights need to be included.
+                        And don&apos;t worry about crafting the perfect intent -
+                        our AI-generated messages are already optimized to facilitate
+                        calls with your prospective connections.
                       </p>
                       <div className='flex justify-between items-center'>
                         <p className="text-gray-700 dark:text-gray-400 font-medium">
-                          Customize your outreach with a short paragraph
+                          Career Summary
                         </p>
                         <p className='text-gray-600 dark:text-gray-500 font-light text-sm'>
                           {bio.length}/{bioMaxLen}
