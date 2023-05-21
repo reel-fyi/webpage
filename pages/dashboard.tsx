@@ -260,8 +260,6 @@ export default function Dashboard() {
                     <div className='flex flex-col gap-3'>
                       {saved ? <SavedNotification /> : null}
                       <p className="mb-2 text-gray-700 dark:text-gray-400 font-light">
-                        Train our AI to craft personalized outreach messages and
-                        take your LinkedIn networking strategy to the next level.
                         To get started, provide a short summary of your career
                         and professional journey. Consider this as your elevator
                         pitch - only the most relevant highlights need to be included.
