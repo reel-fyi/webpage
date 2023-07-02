@@ -1,6 +1,7 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import { CustomFlowbiteTheme, Flowbite, useTheme } from 'flowbite-react';
+import { CustomFlowbiteTheme, Flowbite } from 'flowbite-react';
+import { ClerkProvider } from '@clerk/nextjs';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const theme: CustomFlowbiteTheme = {
@@ -34,12 +35,31 @@ function MyApp({ Component, pageProps }: AppProps) {
         }
       }
     },
-    
   };
 
   return (
     <Flowbite theme={{ theme, dark: false }}>
-      <Component {...pageProps} />
+      <ClerkProvider {...pageProps} appearance={{
+        variables: {
+          colorPrimary: "#6C47FF",
+        },
+        elements: {
+          card: 'bg-white dark:bg-gray-800',
+          logoBox: 'mb-0',
+          headerTitle: 'dark:text-gray-200',
+          headerSubtitle: 'dark:text-gray-400',
+          socialButtonsBlockButton__linkedin: 'dark:text-gray-200 dark:border-gray-400 dark:hover:bg-gray-600 dark:hover:text-white',
+          footerActionText: 'dark:text-gray-200',
+          userPreviewMainIdentifier: 'dark:text-gray-200',
+          userPreviewSecondaryIdentifier: 'dark:text-gray-400',
+          userButtonPopoverActionButton: 'dark:hover:bg-purple-700',
+          userButtonPopoverActionButtonIcon: 'dark:text-gray-200',
+          userButtonPopoverActionButtonText: 'dark:text-gray-200',
+          userButtonPopoverFooter: 'dark:text-gray-200 hidden',
+        }
+      }}>
+        <Component {...pageProps} />
+      </ClerkProvider>
     </Flowbite>
   );
 }
