@@ -9,6 +9,7 @@ import PocketBase, { type Record } from 'pocketbase';
 import mixpanel from 'mixpanel-browser';
 import Header from "../components/Header";
 import welcomeImage from "../public/welcome.svg"
+import { useAuth, useUser } from '@clerk/nextjs';
 
 const CompleteCheckIcon = () => (
   <AiFillCheckCircle className='mr-2 text-purple-700' size={32} />
@@ -44,63 +45,128 @@ export default function Dashboard() {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [isAnalyticsEnabled, setIsAnalyticsEnabled] = useState(false);
   const router = useRouter();
+  const auth = useAuth();
+  const [profile, setProfile] = useState({
+    name: '',
+    bio: '',
+  });
+  const [profileMade, setProfileMade] = useState(false);
+  const user = useUser();
 
+  // Create Profile after signup and show welcome modal
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const settings = {
-        downloadExtension: true,
-        addBio: false,
-        sentFirstReel: false,
-      }
-      const storageData = localStorage.getItem('pocketbase_auth');
-      if (storageData !== null) {
-        const userInfo = JSON.parse(storageData);
-        if (Object.hasOwn(userInfo, 'model')) {
-          setUserData(userInfo.model as Record);
-          if (userInfo.model.bio !== undefined && userInfo.model.bio !== '') {
-            setBio(userInfo.model.bio as string);
-            settings.addBio = true;
-            const sentFirstReel = localStorage.getItem('first_reel_sent');
-            if (sentFirstReel !== null) {
-              settings.sentFirstReel = true;
-            }
+    async function createProfile() {
+      if (auth.isLoaded && user) {
+        try {
+          const req = await fetch('/api/create-profile');
+          const res = await req.json();
+          if (!res?.error) {
+            console.log("profile made!");
+            setProfile({
+              name: res.name,
+              bio: res.bio,
+            });
+            setProfileMade(true);
+          } else {
+            console.error("error: ", res.message);
           }
-          const fname = (userInfo.model['name'] as string).split(' ')[0];
-          setFirstName(fname[0].toUpperCase() + fname.slice(1));
-        }
-      }
-      setCheckList({
-        ...checklist,
-        ...settings,
-      });
-
-      if (router.asPath === '/dashboard?ref=signup') {
-        if (storageData !== null) {
-          setShowWelcomeModal(true);
-          console.log(userData);
-        } else {
-          router.push('/auth?ref=dashboard');
-        }
-      } else if (router.asPath === '/dashboard?ref=bio_saved') {
-        setSaved(true);
-      }
-
-      const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
-      if (token) {
-        mixpanel.init(token, {
-          loaded: () => {
-            if (mixpanel.get_distinct_id() !== userData.id) {
-              mixpanel.identify(userData.id);
-            }
-          }
-        });
-        if (process.env.NODE_ENV === 'production') {
-          setIsAnalyticsEnabled(true);
+        } catch (e) {
+          console.error("caught error: ", e);
+          router.push('/auth/signup');
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+    if (router.asPath === '/dashboard?ref=signup' && !profileMade) {
+      createProfile();
+      setShowWelcomeModal(true);
+    }
+  }, [profileMade, auth.isLoaded, router, user]);
+
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     const settings = {
+  //       downloadExtension: true,
+  //       addBio: false,
+  //       sentFirstReel: false,
+  //     }
+  //     const storageData = localStorage.getItem('pocketbase_auth');
+  //     if (storageData !== null) {
+  //       const userInfo = JSON.parse(storageData);
+  //       if (Object.hasOwn(userInfo, 'model')) {
+  //         const userRecord = userInfo.model as Record;
+  //         recoverData(userRecord);
+  //         setUserData(userRecord);
+  //         if (userInfo.model.bio !== undefined && userInfo.model.bio !== '') {
+  //           setBio(userInfo.model.bio as string);
+  //           settings.addBio = true;
+  //           const sentFirstReel = localStorage.getItem('first_reel_sent');
+  //           if (sentFirstReel !== null) {
+  //             settings.sentFirstReel = true;
+  //           }
+  //         }
+  //         const fname = (userInfo.model['name'] as string).split(' ')[0];
+  //         setFirstName(fname[0].toUpperCase() + fname.slice(1));
+  //       }
+  //     }
+  //     setCheckList({
+  //       ...checklist,
+  //       ...settings,
+  //     });
+
+  //     if (router.asPath === '/dashboard?ref=signup') {
+  //       if (storageData !== null) {
+  //         setShowWelcomeModal(true);
+  //         console.log(userData);
+  //       } else {
+  //         router.push('/auth?ref=dashboard');
+  //       }
+  //     } else if (router.asPath === '/dashboard?ref=bio_saved') {
+  //       setSaved(true);
+  //     }
+
+  //     const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
+  //     if (token) {
+  //       mixpanel.init(token, {
+  //         loaded: () => {
+  //           if (mixpanel.get_distinct_id() !== userData.id) {
+  //             mixpanel.identify(userData.id);
+  //           }
+  //         }
+  //       });
+  //       if (process.env.NODE_ENV === 'production') {
+  //         setIsAnalyticsEnabled(true);
+  //       }
+  //     }
+  //   }
+  //   /*
+  //     NOT USED YET
+  //   */
+  //   // const getLinkedInProfile = async () => {
+  //   //   try {
+  //   //     const req = await fetch('/api/linkedin-profile');
+  //   //     console.log(await req.json())
+  //   //   } catch (e) {
+  //   //     console.error(e);
+  //   //   }
+  //   // }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
+
+  async function recoverData(userRecord: Record) {
+    // const pb = new PocketBase(process.env.NEXT_PUBLIC_API_URL);
+    // try {
+    //   const email: string = userRecord['email'];
+    //   await pb.collection('users').getFirstListItem(`email="${email}"`);
+    // } catch (err) {
+    //   // no record
+    //   console.log("Recreating record in DB");
+    //   const newRecord = await pb.collection('users').create(userRecord);
+    //   console.log(JSON.parse(localStorage.getItem('pocketbase_auth') || '{}'));
+    //   // localStorage.setItem('pocketbase_auth', JSON.stringify(newRecord));
+    // }
+    console.log("recovering user data");
+  }
 
   const handleSave = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -222,7 +288,7 @@ export default function Dashboard() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Header />
+      <Header showUserButton />
       <div className="flex dark:bg-gray-900 min-h-screen">
         <main className="mx-4 mt-4 flex-[1_0_16rem]">
           {showWelcomeModal ? welcomeModalComponent : null}
