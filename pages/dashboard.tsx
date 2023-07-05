@@ -2,7 +2,7 @@ import { Accordion, Alert, Button, Card, Textarea, Modal } from 'flowbite-react'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 import { HiCheck } from 'react-icons/hi'
 import PocketBase, { type Record } from 'pocketbase';
@@ -10,6 +10,10 @@ import mixpanel from 'mixpanel-browser';
 import Header from "../components/Header";
 import welcomeImage from "../public/welcome.svg"
 import { useAuth, useUser } from '@clerk/nextjs';
+
+interface IExisitingUserData {
+  bio?: string,
+}
 
 const CompleteCheckIcon = () => (
   <AiFillCheckCircle className='mr-2 text-purple-700' size={32} />
@@ -55,13 +59,23 @@ export default function Dashboard() {
 
   // Create Profile after signup and show welcome modal
   useEffect(() => {
-    async function createProfile() {
+    async function createProfile(exisitingUserData: IExisitingUserData) {
       if (auth.isLoaded && user) {
         try {
-          const req = await fetch('/api/create-profile');
+          const req = await fetch('/api/create-profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(exisitingUserData),
+          });
           const res = await req.json();
           if (!res?.error) {
-            console.log("profile made!");
+            if (req.status === 201) {
+              console.log("profile made!");
+            } else {
+              console.log("profile already exists");
+            }
             setProfile({
               name: res.name,
               bio: res.bio,
@@ -78,8 +92,20 @@ export default function Dashboard() {
     }
 
     if (router.asPath === '/dashboard?ref=signup' && !profileMade) {
-      createProfile();
-      setShowWelcomeModal(true);
+      let showModal = true;
+      const exisitingUserData:IExisitingUserData = {};
+      if (typeof window !== 'undefined') {
+        const storageData = localStorage.getItem('pocketbase_auth');
+        if (storageData !== null) {
+          showModal = false;
+          const userInfo = JSON.parse(storageData);
+          if (Object.hasOwn(userInfo, 'model')) {
+            exisitingUserData.bio = userInfo.model.bio as string;
+          }
+        }
+      }
+      createProfile(exisitingUserData);
+      setShowWelcomeModal(showModal);
     }
   }, [profileMade, auth.isLoaded, router, user]);
 
