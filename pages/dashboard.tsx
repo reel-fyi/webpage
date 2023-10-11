@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { AiFillCheckCircle, AiOutlineCheckCircle } from 'react-icons/ai';
-import { HiCheck } from 'react-icons/hi'
+import { HiCheck, HiInformationCircle } from 'react-icons/hi'
 import PocketBase, { type Record } from 'pocketbase';
 import mixpanel from 'mixpanel-browser';
 import Header from "../components/Header";
@@ -214,6 +214,20 @@ export default function Dashboard() {
     </Modal>
   );
 
+  const isDown = true;
+  const isDownAlertComponent = (
+    <Alert
+    color="failure"
+    icon={HiInformationCircle}
+  >
+    <span>
+      <span className="font-semibold text-md">
+        Reel.fyi is currently down, please check back later or contact us at&nbsp;<a href="mailto:support@reel.fyi" className='hover:text-red-500'>support@reel.fyi</a>
+      </span>
+    </span>
+  </Alert>
+  );
+
   return (
     <div>
       <Head>
@@ -226,6 +240,7 @@ export default function Dashboard() {
       <div className="flex dark:bg-gray-900 min-h-screen">
         <main className="mx-4 mt-4 flex-[1_0_16rem]">
           {showWelcomeModal ? welcomeModalComponent : null}
+          {isDown ? isDownAlertComponent : null}
           <div className="flex justify-center">
             <Card className="mt-4 mb-4 w-2/3">
               <h2 className="text-xl dark:text-gray-200">Dashboard</h2>
